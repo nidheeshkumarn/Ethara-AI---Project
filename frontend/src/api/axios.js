@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    // When deploying to Railway, we will swap this for the live URL
-    baseURL: 'http://localhost:8000/api/', 
+    // Vite will inject the Railway cloud URL here during the production build
+    baseURL: import.meta.env.VITE_API_BASE_URL, 
 });
 
 // The Interceptor: Automatically attaches the token to every request
