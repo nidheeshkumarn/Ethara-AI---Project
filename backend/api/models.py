@@ -8,7 +8,7 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='member')
 
-class Task(models.fields.Model): # Using standard Model
+class Task(models.Model): # Using standard Model
     STATUS_CHOICES = (
         ('Pending', 'Pending'),
         ('In Progress', 'In Progress'),
