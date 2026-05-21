@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useContext } from 'react';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
-import Login from './pages/Login'; // We will create this next
+import Login from './pages/Login';
+import Signup from './components/Signup'; // Import the new Signup component
 
 // The Bouncer: Checks if the user is logged in
 const ProtectedRoute = ({ children }) => {
@@ -23,8 +24,9 @@ export default function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public Route */}
+                    {/* Public Routes */}
                     <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
 
                     {/* Protected Route */}
                     <Route 

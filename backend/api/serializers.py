@@ -1,21 +1,23 @@
 from rest_framework import serializers
-from .models import User, Project, Task
+from .models import User, Task
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role']
+        fields = ['id', 'username', 'password', 'role']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            role=validated_data.get('role', 'member')
+        )
+        return user
 
 class TaskSerializer(serializers.ModelSerializer):
-    # This makes the API return the full user info, not just the user ID
-    assigned_to_details = UserSerializer(source='assigned_to', read_only=True)
-    
+    assignee_name = serializers.ReadOnlyField(source='assignee.username')
+
     class Meta:
         model = Task
-        fields = '__all__'
-
-class ProjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = '__all__'
-        read_only_fields = ['created_by']
+        fields = ['id', 'title', 'description', 'status', 'assignee', 'assignee_name', 'created_at']
