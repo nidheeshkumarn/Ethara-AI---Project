@@ -1,25 +1,42 @@
 from rest_framework import viewsets, generics, permissions
-from .models import User, Task
-from .serializers import UserSerializer, TaskSerializer
+from rest_framework.exceptions import PermissionDenied
+from .models import User, Project, Task
+from .serializers import UserSerializer, ProjectSerializer, TaskSerializer
 
-# Feature 1: Signup API
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny] # Anyone can sign up
+    permission_classes = [permissions.AllowAny]
 
-# Feature 2 & 3: Task Management & RBAC
+class ProjectViewSet(viewsets.ModelViewSet):
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Project.objects.all()
+
+    def perform_create(self, serializer):
+        if self.request.user.role != 'admin':
+            raise PermissionDenied("Only admins can create projects.")
+        serializer.save(created_by=self.request.user)
+
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        # RBAC: Admins get everything. Members get only their assigned tasks.
         if user.role == 'admin':
             return Task.objects.all()
         return Task.objects.filter(assignee=user)
 
     def perform_create(self, serializer):
-        # Optional: You could force the assigner here, but usually Admins pick the assignee
+        if self.request.user.role != 'admin':
+            raise PermissionDenied("Only admins can assign tasks.")
+        serializer.save()
+        
+    def perform_update(self, serializer):
+        # Members can update, but only the status field
+        if self.request.user.role == 'member' and 'status' not in self.request.data:
+            raise PermissionDenied("Members can only update task status.")
         serializer.save()
