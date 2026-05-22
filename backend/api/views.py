@@ -40,3 +40,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         if self.request.user.role == 'member' and 'status' not in self.request.data:
             raise PermissionDenied("Members can only update task status.")
         serializer.save()
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
