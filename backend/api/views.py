@@ -8,6 +8,16 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
+    def perform_create(self, serializer):
+        requested_role = serializer.validated_data.get('role', 'member')
+        if self.request.user.is_authenticated and self.request.user.role == 'admin':
+            serializer.save(role=requested_role)
+        else:
+            if User.objects.exists():
+                serializer.save(role='member')
+            else:
+                serializer.save(role=requested_role)
+
 class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]

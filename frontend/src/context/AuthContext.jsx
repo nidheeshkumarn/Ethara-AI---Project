@@ -10,7 +10,12 @@ export const AuthProvider = ({ children }) => {
         // On page load, check if they are already logged in
         const token = localStorage.getItem('access_token');
         if (token) {
-            setUser(jwtDecode(token)); // Decodes token to get { user_id: 1, role: 'admin' }
+            try {
+                setUser(jwtDecode(token));
+            } catch (error) {
+                localStorage.removeItem('access_token');
+                setUser(null);
+            }
         }
     }, []);
 
