@@ -5,14 +5,13 @@ import api from '../api/axios';
 export default function Signup() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('member'); // Default role
     const navigate = useNavigate();
 
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
-            await api.post('register/', { username, password, role });
-            navigate('/login'); // Send them to login after successful creation
+            await api.post('register/', { username, password });
+            navigate('/login');
         } catch (err) {
             console.error("Signup failed", err);
         }
@@ -30,17 +29,9 @@ export default function Signup() {
                 />
                 <input 
                     type="password" placeholder="Password" required
-                    className="w-full mb-4 p-2 border rounded"
+                    className="w-full mb-6 p-2 border rounded"
                     value={password} onChange={(e) => setPassword(e.target.value)} 
                 />
-                <select 
-                    className="w-full mb-6 p-2 border rounded"
-                    value={role} onChange={(e) => setRole(e.target.value)}
-                >
-                    <option value="member">Team Member</option>
-                    <option value="admin">Project Admin</option>
-                </select>
-                
                 <button type="submit" className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">
                     Sign Up
                 </button>
